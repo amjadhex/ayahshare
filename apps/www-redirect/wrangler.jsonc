@@ -1,0 +1,8 @@
+// Tiny Worker that permanently redirects www.ayahshare.com to the apex (the app itself is the "quran-design" Worker).
+// The custom domain www.ayahshare.com is attached to this Worker through the Cloudflare dashboard or API.
+{
+  "name": "ayahshare-www",
+  "main": "index.js",
+  "compatibility_date": "2026-09-01",
+  "workers_dev": false
+}

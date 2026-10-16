@@ -1,0 +1,40 @@
+{
+  "name": "ayah-share-mobile",
+  "private": true,
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "scripts": {
+    "check": "node scripts/check-versions.mjs",
+    "build:web": "node scripts/build-web.mjs",
+    "sync": "npm run check && npm run build:web && cap sync",
+    "sync:ios": "npm run check && npm run build:web && cap sync ios",
+    "sync:android": "npm run check && npm run build:web && cap sync android",
+    "open:ios": "cap open ios",
+    "open:android": "cap open android",
+    "assets": "node scripts/make-artwork.mjs && capacitor-assets generate --ios --android --iconBackgroundColor '#0a4237' --iconBackgroundColorDark '#0a4237' --splashBackgroundColor '#0a4237' --splashBackgroundColorDark '#0a4237'"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/clipboard": "8.0.1",
+    "@capacitor/core": "8.5.3",
+    "@capacitor/filesystem": "8.1.4",
+    "@capacitor/haptics": "8.0.2",
+    "@capacitor/ios": "8.5.3",
+    "@capacitor/local-notifications": "8.3.1",
+    "@capacitor/preferences": "8.0.1",
+    "@capacitor/share": "8.0.3",
+    "@capacitor/splash-screen": "8.0.2",
+    "@capacitor/status-bar": "8.0.4",
+    "@capgo/capacitor-media-session": "8.1.2",
+    "@capgo/capacitor-social-login": "8.5.13"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "3.0.5",
+    "@capacitor/cli": "8.5.3",
+    "typescript": "7.0.2"
+  },
+  "allowScripts": {
+    "sharp@0.32.6": true
+  }
+}

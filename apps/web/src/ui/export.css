@@ -1,0 +1,95 @@
+/* The HD chip (controls.tsx HdChip: the Export sheet), the making / ready look shared with the Share
+   screen (the progress ring over the picture, the ✓ badge) and the Export sheet (ExportPanel.tsx): the design's picture
+   with its making / ready state, one row of round actions, quiet text. */
+
+.hd-chip {
+  position: relative; display: inline-grid; place-items: center; flex: none; min-width: 42px; height: 28px; padding: 0 10px;
+  border: 1.5px solid var(--line); border-radius: 99px; background: var(--surface); color: var(--muted);
+  font-size: 12px; font-weight: 700; letter-spacing: 0.08em; line-height: 1;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.hd-chip::before { content: ""; position: absolute; inset: -8px -4px; } /* a 44 px target */
+.hd-chip[aria-pressed="true"] { border-color: var(--accent); background: var(--accent); color: var(--accent-ink); }
+.hd-chip:disabled { opacity: 0.5; cursor: default; }
+
+/* ---------- Export sheet ---------- */
+.export-sheet .export { display: grid; gap: 20px; padding-top: 2px; }
+
+.xp-card { display: flex; align-items: center; gap: 16px; padding: 12px; border-radius: 20px; background: var(--surface-2); }
+.xp-card > .hd-chip { align-self: flex-start; margin: 2px 2px 0 0; }
+.xp-thumb {
+  position: relative; flex: none; width: 66px; aspect-ratio: 9 / 16; overflow: hidden; border-radius: 12px; background: #0b0f0e;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18), 0 0 0 0.5px rgba(0, 0, 0, 0.08);
+}
+.xp-thumb[data-orientation="square"] { width: 96px; aspect-ratio: 1; }
+.xp-thumb[data-orientation="landscape"] { width: 132px; aspect-ratio: 16 / 9; }
+.xp-thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* Making and ready: a larger picture, so the ring fits on it. */
+.xp-thumb.xp-thumb-lg { width: 96px; }
+.xp-thumb.xp-thumb-lg[data-orientation="square"] { width: 120px; }
+.xp-thumb.xp-thumb-lg[data-orientation="landscape"] { width: 160px; }
+.xp-thumb-lg .ring { width: 56px; }
+.xp-thumb-lg .ring-pct { font-size: 14px; }
+.xp-thumb-lg .done-badge { right: 6px; top: 6px; width: 26px; height: 26px; }
+.xp-thumb-lg .done-badge svg { width: 15px; height: 15px; }
+
+/* ---------- Making and ready, on the picture (the Share screen too) ---------- */
+.xp-veil { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(5, 7, 7, 0.55); }
+.ring { position: relative; display: block; width: 76px; aspect-ratio: 1; }
+.ring svg { display: block; width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring circle { fill: none; stroke-width: 6; }
+.ring-track { stroke: rgba(255, 255, 255, 0.25); }
+.ring-arc { stroke: var(--gold-light); stroke-linecap: round; transition: stroke-dasharray 0.25s ease-out; }
+.ring.turning svg { animation: ring-turn 1s linear infinite; }
+@keyframes ring-turn { from { transform: rotate(-90deg); } to { transform: rotate(270deg); } }
+.ring-pct {
+  position: absolute; inset: 0; display: grid; place-items: center; color: #fff;
+  font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums;
+}
+.done-badge {
+  position: absolute; right: 8px; top: 8px; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%;
+  background: #2f9e83; color: #fff; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4); animation: xp-in 0.25s ease-out;
+}
+.done-badge svg { width: 18px; height: 18px; stroke-width: 3; }
+.xp-still { animation: xp-in 0.35s ease-out; }
+@keyframes xp-in { from { opacity: 0; } }
+
+.xp-info { flex: 1; min-width: 0; display: grid; gap: 3px; }
+.xp-title { margin: 0; font-size: 16px; font-weight: 600; letter-spacing: -0.01em; color: var(--ink); }
+.xp-ready { display: flex; align-items: center; gap: 8px; }
+.xp-check { display: grid; place-items: center; flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); }
+.xp-check svg { width: 14px; height: 14px; stroke-width: 2.6; }
+.xp-meta { margin: 0; overflow: hidden; font-size: 13px; color: var(--muted); text-overflow: ellipsis; white-space: nowrap; }
+.xp-cancel {
+  justify-self: start; min-height: 44px; margin: 2px 0 -10px -10px; padding: 0 10px; border: 0; border-radius: 10px;
+  background: none; color: var(--muted); font-size: 14px; font-weight: 600; text-decoration: underline;
+}
+.xp-cancel:hover { color: var(--ink); }
+
+.xp-actions { display: flex; justify-content: center; gap: 6px; }
+.xp-action {
+  display: flex; flex: 1; flex-direction: column; align-items: center; gap: 8px; max-width: 116px; min-width: 0; padding: 2px 0;
+  border: 0; background: none; color: var(--ink); text-align: center;
+}
+.xp-circle {
+  display: grid; place-items: center; width: 62px; height: 62px; border: 1px solid var(--line); border-radius: 50%;
+  background: var(--surface-2); color: var(--ink); transition: transform 0.15s, background 0.15s;
+}
+.xp-circle svg { width: 24px; height: 24px; }
+.xp-action.primary .xp-circle { border-color: transparent; background: var(--accent); color: var(--accent-ink); }
+.xp-action:not(:disabled):active .xp-circle { transform: scale(0.94); }
+.xp-action:disabled { opacity: 0.45; cursor: default; }
+.xp-label { max-width: 100%; font-size: 13px; font-weight: 500; line-height: 1.25; overflow-wrap: anywhere; }
+.xp-action small { margin-top: -6px; font-size: 12px; color: var(--muted); }
+@media (hover: hover) { .xp-action:hover:not(:disabled) .xp-circle { transform: scale(1.04); } }
+
+.xp-quality { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 13px; color: var(--muted); }
+.xp-hint { margin: -6px 0 0; text-align: center; font-size: 12.5px; color: var(--muted); }
+.xp-status { margin: -6px 0 0; text-align: center; font-size: 13px; color: var(--muted); }
+.xp-status:not(.on) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); } /* still announced */
+
+@media (prefers-reduced-motion: reduce) {
+  .hd-chip, .ring-arc, .xp-circle { transition: none; }
+  .xp-still, .done-badge { animation: none; }
+  .ring.turning svg { animation-duration: 3s; }
+}

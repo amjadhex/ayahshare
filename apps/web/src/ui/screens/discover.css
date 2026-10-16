@@ -1,0 +1,153 @@
+/* Discover (ui/screens/Discover.tsx). Light and dark come from the theme tokens in styles.css; pictures sit on a dark
+   scrim in both themes. Phones: a full-width page with horizontal rows. From 760 px: a centred content column where the
+   rows wrap instead of scrolling sideways. */
+.disc { max-width: 760px; margin: 0 auto; padding-bottom: 32px; }
+:where(.disc) :where(ul, ol) { list-style: none; margin: 0; padding: 0; }
+
+.disc-head {
+  position: sticky; top: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between;
+  padding: calc(8px + env(safe-area-inset-top)) 8px 4px 16px; background: var(--bg);
+}
+.disc-head h1 { font: 700 24px/1.2 var(--font-display); letter-spacing: -0.3px; }
+.disc-icon { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: none; color: var(--ink); }
+.disc-icon svg { width: 24px; height: 24px; stroke-width: 1.8; }
+/* Hover only with a real pointer: the stories' × sits where the search button is, and a phone keeps :hover after a tap. */
+@media (hover: hover) { .disc-icon:hover { background: var(--surface-2); } }
+.disc-note { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 16px; color: var(--muted); }
+
+/* ---------- pictures ---------- */
+.disc-thumb { position: relative; display: block; width: 100%; height: 100%; overflow: hidden; background: linear-gradient(135deg, #0f5c4d, #12342d); }
+/* The clip's preview, faded in over the picture once it plays (tilePlay.ts sets data-on). */
+.disc-thumb video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.3s; }
+.disc-thumb video[data-on] { opacity: 1; }
+.disc-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.disc-skel {
+  border-radius: 16px; background: linear-gradient(90deg, var(--surface-3), var(--surface-2), var(--surface-3)); background-size: 200% 100%;
+  animation: shimmer 1.2s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) { .disc-skel { animation: none; } }
+
+/* ---------- stories ---------- */
+.disc-stories { display: flex; gap: 14px; overflow-x: auto; scrollbar-width: none; padding: 8px 16px 14px; }
+.disc-stories::-webkit-scrollbar { display: none; }
+.disc-story { flex: none; display: flex; flex-direction: column; align-items: center; gap: 6px; width: 76px; padding: 0; border: 0; background: none; color: var(--ink); font-size: 12px; line-height: 1.25; text-align: center; }
+.disc-ring { display: block; width: 68px; height: 68px; padding: 3px; border-radius: 50%; background: linear-gradient(135deg, #0f5c4d, #d9a648); }
+.disc-ring .disc-thumb { border: 2px solid var(--bg); border-radius: 50%; }
+/* A watched circle (seenStories.ts): a thin grey ring and a quieter picture, like Instagram. */
+.disc-story[data-seen] .disc-ring { padding: 2px; margin: 1px; width: 66px; height: 66px; background: color-mix(in srgb, var(--ink) 22%, var(--bg)); }
+.disc-story[data-seen] .disc-ring .disc-thumb { opacity: 0.75; }
+.disc-story[data-seen] .disc-story-label { color: var(--muted); }
+.disc-story-label { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; max-width: 100%; overflow-wrap: anywhere; }
+
+/* ---------- ayah of the day ---------- */
+.disc-aotd, .disc-aotd-skel { margin: 0 16px; border-radius: 24px; }
+.disc-aotd-skel { height: 330px; }
+.disc-aotd { position: relative; display: flex; flex-direction: column; justify-content: flex-end; min-height: 330px; overflow: hidden; background: #0b0f0e; color: #fff; }
+.disc-aotd > .disc-thumb { position: absolute; inset: 0; }
+.disc-scrim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.35) 40%, rgba(0, 0, 0, 0.8) 100%); }
+.disc-badge {
+  position: absolute; top: 16px; left: 16px; display: flex; align-items: center; height: 28px; padding: 0 12px; border-radius: 14px;
+  background: rgba(255, 255, 255, 0.92); color: #0f5c4d; font-size: 12px; font-weight: 700;
+}
+.disc-aotd-body { position: relative; padding: 64px 18px 18px; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5); }
+.disc-ar { margin: 0; font: 22px/1.95 var(--font-quran); text-align: right; }
+.disc-tr { margin: 6px 0 0; font-size: 14px; line-height: 1.45; }
+.disc-pill {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 26px; margin: 10px 0 0; padding: 3px 10px; border-radius: 13px;
+  background: rgba(0, 0, 0, 0.4); font-size: 12px; font-weight: 600; text-shadow: none;
+}
+.disc-pill svg { width: 14px; height: 14px; stroke-width: 2.2; }
+.disc-aotd-foot { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+.disc-aotd-foot > span { flex: 1; min-width: 0; font-size: 13px; opacity: 0.92; }
+.disc-create { flex: none; min-height: 44px; padding: 0 20px; border: 0; border-radius: 22px; background: #fff; color: #0f5c4d; font-weight: 700; text-shadow: none; }
+.disc-create:active { background: #e9efed; }
+
+/* ---------- headings ---------- */
+.disc-h { margin: 28px 16px 4px; font: 700 17px/1.3 var(--font-ui); letter-spacing: 0; text-transform: none; color: var(--ink); }
+.disc-sub { margin: 0 16px; font-size: 13px; color: var(--muted); }
+.disc-h-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 28px 16px 10px; }
+.disc-h-row .disc-h { margin: 0; }
+.disc-pill-btn { min-height: 44px; padding: 0 16px; border: 1px solid var(--line); border-radius: 22px; background: var(--surface); color: var(--ink); font-size: 13px; font-weight: 600; }
+.disc-pill-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.disc-pill-btn:disabled { opacity: 0.5; cursor: default; }
+
+/* ---------- play a whole surah ---------- */
+.disc-strip.disc-surahs { gap: 10px; }
+.disc-strip.disc-surahs li { width: 148px; }
+.disc-surah { position: relative; display: block; width: 100%; height: 212px; padding: 0; border: 0; border-radius: 16px; overflow: hidden; background: #0b0f0e; color: #fff; text-align: start; }
+.disc-surah .disc-thumb { position: absolute; inset: 0; }
+.disc-surah .disc-tile-scrim { background: linear-gradient(180deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7)); }
+.disc-surah-chip { position: absolute; top: 10px; left: 10px; display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 10px 0 8px; border-radius: 12px; background: rgba(0, 0, 0, 0.55); font-size: 11px; font-weight: 600; }
+.disc-surah-chip svg { width: 10px; height: 10px; }
+.disc-surah-text { position: absolute; left: 12px; right: 12px; bottom: 16px; display: grid; gap: 2px; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6); }
+.disc-surah-ar { font: 20px/1.7 var(--font-quran); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.disc-surah-text strong { font-size: 15px; font-weight: 700; }
+.disc-surah-text span:last-child { font-size: 12px; }
+.disc-surah-bar { position: absolute; left: 12px; right: 12px; bottom: 8px; height: 3px; border-radius: 2px; background: rgba(255, 255, 255, 0.3); overflow: hidden; }
+.disc-surah-bar i { display: block; height: 100%; background: #fff; }
+
+/* ---------- most shared today ---------- */
+.disc-ranked { padding: 8px 16px 0; }
+.disc-ranked li + li { border-top: 1px solid var(--line); }
+.disc-ranked button { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 64px; padding: 8px 0; border: 0; background: none; color: var(--ink); text-align: start; }
+.disc-ranked button > svg { width: 18px; height: 18px; color: var(--muted); }
+.disc-ranked button:hover .disc-ranked-text strong { color: var(--accent); }
+.disc-rank { flex: none; width: 22px; font: 700 18px var(--font-display); color: var(--accent); text-align: center; }
+.disc-mini { flex: none; width: 48px; height: 48px; border-radius: 12px; overflow: hidden; }
+.disc-ranked-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.disc-ranked-text strong { font-size: 15px; font-weight: 600; }
+.disc-ranked-text span { display: flex; align-items: center; gap: 5px; font-size: 13px; color: var(--muted); }
+.disc-ranked-text svg { width: 14px; height: 14px; stroke-width: 2.2; }
+
+/* ---------- watch and listen ---------- */
+.disc-strip { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 4px 16px 6px; }
+.disc-strip::-webkit-scrollbar { display: none; }
+.disc-strip li { flex: none; width: 116px; }
+.disc-reel { position: relative; display: block; width: 100%; aspect-ratio: 9 / 16; padding: 0; border: 0; border-radius: 16px; overflow: hidden; background: #0b0f0e; color: #fff; }
+.disc-reel::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.62)); }
+.disc-reel .disc-thumb { position: absolute; inset: 0; }
+.disc-reel-play { position: absolute; z-index: 1; top: 8px; right: 8px; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: rgba(0, 0, 0, 0.55); }
+.disc-reel-play svg { width: 12px; height: 12px; }
+.disc-reel-label { position: absolute; z-index: 1; left: 10px; right: 10px; bottom: 10px; font-size: 12px; font-weight: 700; text-align: start; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6); }
+.disc-skel.disc-reel { height: auto; }
+
+/* ---------- short ayahs ---------- */
+.disc-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; margin-top: 10px; }
+.disc-tile { position: relative; display: block; width: 100%; aspect-ratio: 3 / 4; padding: 0; border: 0; overflow: hidden; background: #0b0f0e; color: #fff; }
+.disc-tile .disc-thumb { position: absolute; inset: 0; }
+.disc-tile-scrim { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.42); }
+.disc-tile-ar {
+  position: absolute; left: 8px; right: 8px; top: 50%; transform: translateY(-50%); font: 15px/1.9 var(--font-quran); text-align: center;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+.disc-tile-ref { position: absolute; left: 8px; bottom: 8px; font-size: 11px; font-weight: 600; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6); }
+.disc-skel.disc-tile { border-radius: 0; aspect-ratio: 3 / 4; }
+
+/* ---------- collections ---------- */
+.disc-collections { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; padding: 10px 16px 4px; }
+.disc-collections::-webkit-scrollbar { display: none; }
+.disc-collections li { flex: none; width: 150px; }
+.disc-collection { position: relative; display: block; width: 100%; height: 190px; padding: 0; border: 0; border-radius: 18px; overflow: hidden; background: #0b0f0e; color: #fff; }
+.disc-collection .disc-thumb { position: absolute; inset: 0; }
+.disc-collection-scrim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.72)); }
+.disc-collection-text { position: absolute; left: 12px; right: 12px; bottom: 12px; display: flex; flex-direction: column; gap: 1px; text-align: start; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6); }
+.disc-collection-text strong { font-size: 15px; font-weight: 700; line-height: 1.25; }
+.disc-collection-text span { font-size: 12px; opacity: 0.9; }
+
+/* ---------- tablets and computers: a content column; the rows wrap instead of scrolling sideways ---------- */
+@media (min-width: 760px) {
+  .disc-head { padding-inline-start: 16px; }
+  .disc-stories { flex-wrap: wrap; overflow: visible; gap: 16px 18px; }
+  .disc-strip { display: grid; grid-template-columns: repeat(auto-fill, minmax(116px, 1fr)); overflow: visible; gap: 10px; }
+  .disc-strip li { width: auto; }
+  .disc-strip.disc-surahs { grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); }
+  .disc-strip.disc-surahs li { width: auto; }
+  .disc-collections { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); overflow: visible; gap: 12px; }
+  .disc-collections li { width: auto; }
+  .disc-tiles { gap: 6px; padding: 0 16px; }
+  .disc-tile { border-radius: 14px; }
+  .disc-skel.disc-tile { border-radius: 14px; }
+  .disc-ar { font-size: 26px; }
+  .disc-tile-ar { font-size: 18px; }
+  .disc-aotd-body { padding: 72px 28px 24px; }
+}

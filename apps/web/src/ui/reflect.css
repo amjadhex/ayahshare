@@ -1,0 +1,177 @@
+/* Reflect sheet (Reflect.tsx): tabs, the tafsir laid out for reading (classes from the Worker: contracts TafsirClass),
+   and the Scholars' notes and Reflections cards. Tokens from styles.css; nothing here relies on older Reflect rules. */
+
+/* Taller than other sheets (owner, 12 Oct 2026: more room for the reading), a sliver of the reel left above it. */
+dialog.sheet.rf-sheet { max-width: 720px; height: calc(100dvh - max(28px, env(safe-area-inset-top) + 12px)); max-height: calc(100dvh - max(28px, env(safe-area-inset-top) + 12px)); }
+/* Reading one tafsir (owner, 12 Oct 2026): the sheet fills the screen and the tabs step aside; All tafsirs goes back. */
+dialog.sheet.rf-sheet.rf-reading { height: 100dvh; max-height: 100dvh; border-radius: 0; }
+.rf-reading .sheet-grab, .rf-reading .rf-tabs { display: none; }
+.rf-reading .rf-tafsir { scroll-margin-top: 0; }
+.rf-sheet .sheet-head h2 { font-family: var(--font-display); font-weight: 500; font-size: 16.5px; } /* Medium (owner, 12 Oct 2026) */
+/* A compact top (owner, 12 Oct 2026): the handle, title and tabs take less height, so the reading starts higher. */
+.rf-sheet .sheet-grab { height: 16px; }
+.rf-sheet .sheet-head { padding-bottom: 0; }
+
+/* Tabs as plain words with a short line under the one shown (owner, 12 Oct 2026: no box), edge to edge on a hairline;
+   sticky, on the sheet's own colour so what scrolls under them is covered. */
+.rf-tabs {
+  position: sticky; top: -6px; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; margin: -6px -20px 14px; padding-top: 2px;
+  background: var(--surface); border-bottom: 1px solid var(--line);
+}
+.rf-tab { position: relative; min-height: 40px; border: 0; background: none; color: var(--muted); font-size: 14.5px; font-weight: 500; }
+.rf-tab[aria-selected="true"] { color: var(--ink); font-weight: 600; }
+.rf-tab[aria-selected="true"]::after {
+  content: ""; position: absolute; left: 50%; bottom: -1px; width: 40px; height: 2.5px; border-radius: 3px 3px 0 0; transform: translateX(-50%); background: var(--accent);
+}
+.rf-tab:focus-visible { outline-offset: -4px; }
+/* The tab switched to slides in from its side (a swipe or a tap); its panel is shown again, so the animation runs. */
+.rf-panes { min-height: 60%; }
+.rf-panes[data-from="right"] > [role="tabpanel"]:not([hidden]) { animation: rf-in-right 0.22s ease-out; }
+.rf-panes[data-from="left"] > [role="tabpanel"]:not([hidden]) { animation: rf-in-left 0.22s ease-out; }
+@keyframes rf-in-right { from { opacity: 0.4; transform: translateX(24px); } }
+@keyframes rf-in-left { from { opacity: 0.4; transform: translateX(-24px); } }
+@media (prefers-reduced-motion: reduce) { .rf-panes > [role="tabpanel"] { animation: none !important; } }
+.rf-status { display: flex; align-items: center; gap: 8px; margin: 8px 0; color: var(--muted); font-size: 14px; }
+.rf-status .spinner { border-color: var(--surface-3); border-top-color: var(--accent); }
+.rf-note { margin: 0 0 14px; padding: 10px 12px; border-radius: 12px; background: var(--accent-soft); color: var(--ink); font-size: 13.5px; line-height: 1.5; }
+
+/* ---------- Tafsir ---------- */
+.rf-source { display: flex; align-items: flex-start; gap: 12px; margin: 0 0 12px; }
+.rf-source-text { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; font-size: 13px; color: var(--muted); }
+.rf-source strong { color: var(--ink); font-size: 15px; font-weight: 700; font-family: var(--font-display); }
+.rf-covers { white-space: nowrap; }
+/* The languages: one row of chips that scrolls sideways; the one shown is filled. */
+.rf-langs { display: flex; gap: 8px; margin: 0 -20px 14px; padding: 2px 20px; overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain; }
+.rf-langs::-webkit-scrollbar { display: none; }
+.rf-langs button { flex: none; min-height: 36px; padding: 0 14px; border: 1px solid var(--line); border-radius: 99px; background: none; color: var(--ink); font-size: 13.5px; font-weight: 500; white-space: nowrap; }
+.rf-langs button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+@media (pointer: coarse) { .rf-langs button { min-height: 44px; } }
+/* A tafsir's card: an initials avatar (a book has no photo), the start of its passage, "Read". */
+.rf-avatar.rf-tavatar { background: linear-gradient(135deg, #0f5c4d, #d9a648); color: #fff; font-size: 13px; letter-spacing: 0.02em; }
+.rf-source .rf-tavatar, .rf-source .rf-cover { margin-top: 2px; }
+/* A book cover in place of the avatar: a small portrait, slightly rounded, with a hairline so a light cover keeps its edge. */
+.rf-cover { flex: none; width: 36px; height: 52px; object-fit: cover; border-radius: 4px; background: var(--surface-2); box-shadow: 0 0 0 1px var(--line), 0 1px 3px rgba(0, 0, 0, 0.25); }
+.rf-body.rf-excerpt { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; white-space: normal; }
+.rf-wait { color: var(--muted); }
+.rf-excerpt[lang="ar"], .rf-excerpt[lang="ku"] { font-family: "Noto Naskh Arabic", "Geeza Pro", var(--font-quran); font-size: 15.5px; line-height: 1.85; }
+.rf-excerpt[lang="ur"] { font-family: "Noto Nastaliq Urdu", "Noto Naskh Arabic", "Geeza Pro", serif; line-height: 2.1; }
+/* The reader's top, kept in view while reading (the sheet's own title and close step aside): back, cover, name,
+   author · language, and the ayahs it explains. */
+.rf-reading .sheet-head { display: none; }
+.rf-reading .sheet-inner { padding-top: env(safe-area-inset-top); } /* full height: clear of the status bar */
+.rf-reader-head {
+  position: sticky; top: -6px; z-index: 1; display: flex; align-items: center; gap: 10px; margin: -6px -20px 14px; padding: 10px 20px 10px 8px;
+  background: var(--surface); border-bottom: 1px solid var(--line);
+}
+.rf-back { flex: none; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; background: none; color: var(--ink); }
+.rf-back svg { width: 22px; height: 22px; }
+.rf-reader-title { min-width: 0; display: flex; flex-direction: column; gap: 1px; font-size: 12.5px; line-height: 1.35; color: var(--muted); }
+.rf-reader-title strong { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--ink); font: 600 15px/1.3 var(--font-display); }
+.rf-picks { margin: 0; padding: 0; list-style: none; }
+.rf-pick {
+  display: flex; align-items: center; gap: 12px; width: 100%; min-height: 52px; padding: 6px 4px; border: 0; border-bottom: 1px solid var(--line);
+  background: none; color: var(--ink); font: inherit; font-size: 15px; text-align: start; cursor: pointer;
+}
+.rf-picks li:last-child .rf-pick { border-bottom: 0; }
+.rf-pick[aria-current="true"] .trp-dot { border: 6px solid var(--accent); }
+.rf-pick[aria-current="true"] .trp-name { font-weight: 600; }
+.rf-pick:hover .trp-name { color: var(--accent); }
+.rf-pick:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 8px; }
+.rf-none { margin: 4px 0 8px; color: var(--muted); font-size: 14px; }
+
+.rf-tafsir { scroll-margin-top: 76px; } /* clear of the sticky tabs when Read scrolls to its top */
+.rf-tafsir-text { font-size: 15.5px; line-height: 1.55; color: var(--ink); overflow-wrap: anywhere; } /* owner, 12 Oct 2026: tighter (was 1.7) */
+.rf-tafsir-text > * { margin: 0 0 14px; }
+/* Long tafsirs (up to 100,000 characters) lay out only what is near the screen: Urdu Ibn Kathir on 1:1 took 330 ms of
+   layout on a 4x slower CPU, 7 ms this way. Each block keeps its size once it has been shown, so scrolling back is calm. */
+.rf-tafsir-text > * { content-visibility: auto; contain-intrinsic-size: auto 240px; }
+.rf-tafsir-text h2, .rf-tafsir-text h3, .rf-tafsir-text h4 { letter-spacing: 0; text-transform: none; color: var(--ink); line-height: 1.35; }
+.rf-tafsir-text h2, .rf-tafsir-text h3 { margin: 26px 0 10px; font: 700 16.5px/1.35 var(--font-display); }
+.rf-tafsir-text h4 { margin: 20px 0 8px; font-size: 15.5px; font-weight: 700; }
+.rf-tafsir-text > :first-child { margin-top: 0; }
+.rf-tafsir-text hr { border: 0; border-top: 1px solid var(--line); margin: 20px 0; }
+.rf-tafsir-text ul, .rf-tafsir-text ol { padding-inline-start: 1.3em; }
+
+/* Quoted Quran in a calm ink: emerald, soft gold in the dark. */
+.rf-tafsir-text { --rf-ink: var(--accent); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .rf-tafsir-text { --rf-ink: var(--gold); } }
+:root[data-theme="dark"] .rf-tafsir-text { --rf-ink: var(--gold); }
+
+/* A quoted ayah or Arabic passage, set as a printed tafsir sets it: no box, set apart by space; the Arabic a size up,
+   right to left in the Quran font; the translation the source gives under it, quieter, then its reference. */
+.rf-tafsir-text .rf-q { margin: 20px 0 26px; } /* less above: the Arabic's tall lines bring their own space */
+.rf-tafsir-text > .rf-q:first-child { margin-top: 4px; }
+.rf-tafsir-text .rf-ar { margin: 0; font-family: var(--font-quran); font-size: 1.5em; line-height: 2; text-align: right; color: var(--rf-ink); overflow-wrap: normal; }
+.rf-tafsir-text .rf-q .rf-tr { margin: 2px 0 0; font-size: 0.94em; line-height: 1.6; color: var(--muted); }
+.rf-tafsir-text .rf-q .rf-ref { margin: 2px 0 0; font-size: 12px; line-height: 1.5; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* Inside sentences (Arabic, Urdu and Kurdish tafsirs): the quoted ayah stands out, references and markers step back. */
+.rf-tafsir-text .rf-aya { font-family: var(--font-quran); font-size: 1.08em; color: var(--rf-ink); }
+.rf-tafsir-text span.rf-ref { font-size: 0.82em; color: var(--muted); }
+.rf-tafsir-text .rf-mark { font-size: 0.72em; line-height: 0; vertical-align: super; color: var(--muted); }
+.rf-tafsir-text .rf-fn { font-size: 13.5px; line-height: 1.6; color: var(--muted); margin-bottom: 8px; }
+.rf-tafsir-text .rf-page { font-size: 12px; color: var(--muted); text-align: end; margin: -6px 0 14px; }
+/* Arabic words inside a tafsir in another language. */
+.rf-tafsir-text:not([lang="ar"], [lang="ur"], [lang="fa"], [lang="ku"]) span[lang="ar"] { font-family: var(--font-quran); font-size: 1.1em; }
+
+.rf-tafsir-text[lang="ar"] { font-family: "Noto Naskh Arabic", "Geeza Pro", var(--font-quran); font-size: 17.5px; line-height: 2; }
+.rf-tafsir-text[lang="ur"] { font-family: "Noto Nastaliq Urdu", "Noto Naskh Arabic", "Geeza Pro", serif; font-size: 17px; line-height: 2.25; }
+.rf-tafsir-text[lang="fa"], .rf-tafsir-text[lang="ku"] { font-family: "Noto Naskh Arabic", "Geeza Pro", var(--font-quran); font-size: 17px; line-height: 2; }
+.rf-tafsir-text[lang="bn"] { line-height: 1.85; }
+.rf-tafsir-text[lang="ml"] { font-family: "Noto Serif Malayalam", "Malayalam Sangam MN", "Kartika", "Nirmala UI", serif; font-size: 15.5px; line-height: 1.5; } /* owner, 12 Oct 2026: was 16.5px / 1.95, then 14px / 1.5; the text a little bigger again, the lines kept tight */
+/* Thafheem: the ayahs a block of notes covers, then each note under its number. */
+.rf-tafsir-text[lang="ml"] h4:first-child { margin-top: 2px; color: var(--muted); font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.rf-tafsir-text[lang="ml"] p > strong:first-child { color: var(--rf-ink); font-variant-numeric: tabular-nums; }
+
+/* ---------- Reflections ---------- */
+.rf-section + .rf-section { margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--line); }
+.rf-h { margin: 0; font: 500 17px/1.3 var(--font-display); /* Medium (owner, 12 Oct 2026) */ letter-spacing: 0; text-transform: none; color: var(--ink); }
+.rf-scholars .rf-h::before, .rf-tafsir > .rf-h::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-inline-end: 8px; border-radius: 50%; background: var(--gold); vertical-align: middle; }
+.rf-sub { margin: 4px 0 12px; font-size: 13px; line-height: 1.45; color: var(--muted); }
+.rf-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.rf-card { padding: 14px 16px 4px; border-radius: 16px; border: 1px solid var(--line); background: var(--surface); }
+.rf-scholars .rf-card { border-color: color-mix(in srgb, var(--gold) 45%, var(--line)); background: color-mix(in srgb, var(--gold) 5%, var(--surface)); }
+.rf-card-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.rf-avatar {
+  flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; overflow: hidden;
+  background: var(--accent-soft); color: var(--accent); font-size: 14px; font-weight: 700;
+}
+.rf-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.rf-who { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.rf-name { display: inline-flex; align-items: center; gap: 4px; font-size: 14.5px; font-weight: 600; overflow-wrap: anywhere; }
+.rf-tick { flex: none; width: 16px; height: 16px; }
+.rf-tick circle { fill: var(--accent); stroke: none; }
+.rf-tick path { fill: none; stroke: var(--accent-ink); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.rf-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; font-size: 12.5px; color: var(--muted); }
+.rf-tag { padding: 1px 8px; border-radius: 99px; background: var(--surface-3); color: var(--muted); font-size: 11.5px; }
+.rf-body { margin: 0; white-space: pre-line; font-size: 14.5px; line-height: 1.6; overflow-wrap: anywhere; }
+.rf-cite { display: block; margin: 6px 0; padding-inline-start: 10px; border-inline-start: 2px solid var(--line); color: var(--muted); font-size: 13px; line-height: 1.5; }
+.rf-hashtags { margin: 8px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.5; overflow-wrap: anywhere; }
+.rf-body.rf-clamped { display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; }
+.rf-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 0 16px; }
+.rf-link {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0; border: 0; background: none;
+  color: var(--accent); font-size: 13.5px; font-weight: 600; text-decoration: none;
+}
+.rf-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+/* The credit at the foot of Reflections: QuranReflect's mark and name, quiet. */
+.rf-powered { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; margin-top: 18px; color: var(--muted); font-size: 12.5px; text-decoration: none; }
+.rf-powered img { flex: none; width: 14px; height: 18px; }
+.rf-powered:hover { color: var(--ink); }
+/* Copy and Share as icons on the right of the foot; Report as a small flag at the top right of the card. */
+.rf-acts { display: flex; align-items: center; margin-inline-start: auto; margin-inline-end: -10px; }
+.rf-act, .rf-flag { display: grid; place-items: center; width: 40px; height: 44px; padding: 0; border: 0; background: none; color: var(--muted); }
+.rf-act svg { width: 18px; height: 18px; }
+.rf-act:hover, .rf-flag:hover { color: var(--ink); }
+.rf-act:disabled { opacity: 0.4; }
+.rf-flag { align-self: flex-start; width: 36px; height: 36px; margin: -8px -10px 0 auto; opacity: 0.7; }
+.rf-flag svg { width: 15px; height: 15px; }
+.rf-more {
+  width: 100%; min-height: 44px; margin-top: 12px; border-radius: 22px; border: 1px solid var(--line);
+  background: var(--surface-2); color: var(--ink); font-size: 14px; font-weight: 600;
+}
+.rf-more:disabled { opacity: 0.6; cursor: default; }
+
+@media (min-width: 760px) {
+  .rf-tafsir-text { font-size: 16px; }
+}

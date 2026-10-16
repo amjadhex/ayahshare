@@ -1,0 +1,307 @@
+/* Reels (ui/Feed.tsx): full-bleed, dark, vertical swipe. The reel's picture, text and scrolling rules stay in styles.css
+   (".feed-wrap", ".reels", ".reel", ".reel-frame"); this file sizes the screen for the new shell and restyles the controls
+   like the approved design: the mood as the title with the sound and settings buttons on top, the Like / Save / Share / Download / Reflect
+   rail on the right, the details at the bottom left (with Customize beside the surah and reciter), a thin progress bar along the bottom. */
+
+/* ---------- the screen ---------- */
+.screen[data-screen="feed"] { min-height: 0; height: 100dvh; overflow: hidden; background: #000; color: #fff; }
+/* Phones: the reels end above the dark bottom bar. */
+.app[data-layout="phone"] .screen[data-screen="feed"] { height: calc(100dvh - var(--nav-h)); }
+/* Tablets and computers: a centred portrait column next to the side bar. */
+.app:not([data-layout="phone"]) .screen[data-screen="feed"] { background: var(--bg); color: var(--ink); }
+.feed-wrap.wide { padding: 16px 0; }
+.feed-wrap.wide .reels { border-radius: 20px; }
+
+/* One reel per swipe, and cheap to scroll: each reel snaps and stops (never skipped), and is laid out and painted on its own. */
+.feed-wrap .reels { scroll-snap-type: y mandatory; scroll-behavior: auto; overscroll-behavior-y: contain; }
+.feed-wrap .reel { scroll-snap-align: start; scroll-snap-stop: always; contain: layout paint style; }
+.reel.placeholder { background: #0b0f0e; color: rgba(255, 255, 255, 0.82); }
+
+/* ---------- top: the mood ("For you ▾", opens How are you feeling?), sound, settings (opens Language and audio) ---------- */
+.feed-wrap .feed-top {
+  flex-direction: column; align-items: stretch; gap: 2px; padding: calc(6px + env(safe-area-inset-top)) 8px 12px 16px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.25) 65%, transparent);
+}
+.feed-wrap .feed-top > .reels-bar { pointer-events: none; }
+.reels-bar { display: flex; align-items: center; gap: 8px; min-height: 44px; }
+.reels-bar > * { pointer-events: auto; }
+.reels-mood {
+  flex: 0 1 auto; min-width: 0; margin-right: auto; display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0 4px;
+  border: 0; background: none; color: #fff; font: 500 19px/1.2 var(--font-display); letter-spacing: -0.1px; /* Medium, smaller (owner, 12 Oct 2026) */ text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+}
+.reels-mood span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Today's ayah on screen (Feed.tsx, today.ts): the title and the day in place of the mood, and "Remind me" (the app only). */
+.reels-today {
+  flex: 1 1 auto; min-width: 0; margin: 0 auto 0 0; padding: 0 4px; display: flex; flex-direction: column; gap: 1px; color: #fff;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+}
+.reels-today strong { font: 700 19px/1.2 var(--font-display); }
+.reels-today span { font-size: 13px; opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.reels-remind {
+  flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 14px 0 12px; border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px; background: rgba(0, 0, 0, 0.4); color: #fff; font-size: 14px; font-weight: 600; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+.reels-remind svg { width: 18px; height: 18px; stroke-width: 1.9; }
+.reels-settings-wrap[hidden] { display: none; }
+/* The daily reminder sheet: the usual three times, any other time, then turn on / save and turn off / not now. */
+.reminder-sheet .hint { margin: 0 2px 16px; font-size: 14px; line-height: 1.45; color: var(--muted); }
+.reminder-times { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.reminder-times button {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 60px; border: 1px solid var(--line);
+  border-radius: 16px; background: none; color: var(--ink); font-size: 14px; font-weight: 600;
+}
+.reminder-times button span { font-size: 12.5px; font-weight: 400; color: var(--muted); }
+.reminder-times button[aria-checked="true"] { border: 1.5px solid var(--accent); background: var(--accent-soft); }
+.reminder-other { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; margin-top: 8px; font-size: 14px; font-weight: 600; }
+.reminder-other input { min-height: 40px; padding: 0 10px; border: 1px solid var(--line); border-radius: 10px; background: none; color: var(--ink); font: inherit; }
+.reminder-actions { display: grid; gap: 6px; margin-top: 16px; }
+.reminder-actions .btn { width: 100%; border-radius: 999px; min-height: 50px; }
+.reels-mood svg { flex: none; width: 20px; height: 20px; stroke-width: 2.4; filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5)); }
+.reels-mute {
+  flex: none; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%;
+  background: rgba(0, 0, 0, 0.4); color: #fff; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+.reels-mute svg { width: 22px; height: 22px; stroke-width: 1.9; }
+.reels-mute:active { background: rgba(255, 255, 255, 0.2); }
+/* The settings button holds the one-time bubble about the voice under it. */
+.reels-settings-wrap { position: relative; flex: none; }
+
+/* "How are you feeling?": For you as a card, then the moods as chips; the one playing is marked. */
+.mood-sheet .mood-you {
+  display: flex; align-items: center; gap: 12px; width: 100%; min-height: 60px; padding: 10px 14px; border: 1.5px solid var(--line);
+  border-radius: 16px; background: none; color: var(--ink); text-align: start;
+}
+.mood-sheet .mood-you[aria-pressed="true"] { border-color: var(--accent); }
+.mood-you-text { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.mood-you-text strong { font-size: 16px; font-weight: 600; }
+.mood-you-text span { font-size: 13px; color: var(--muted); }
+.mood-you svg { flex: none; width: 20px; height: 20px; stroke-width: 2.4; color: var(--accent); }
+.mood-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.mood-list button { min-height: 44px; padding: 0 16px; border: 1px solid var(--line); border-radius: 99px; background: none; color: var(--ink); font-size: 14px; }
+.mood-list button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+
+/* Language and audio: My language (opens the language picker), then Hear the meaning with a line on what it does. */
+.reel-settings-sheet .reel-voice { margin-top: 14px; }
+.reel-settings-sheet .reel-textsize { display: grid; gap: 8px; margin-top: 18px; }
+.reel-settings-sheet .hint { margin: 4px 2px 0; font-size: 13px; line-height: 1.4; color: var(--muted); }
+.feed-wrap.wide .feed-top { top: 16px; width: min(calc((100dvh - 32px) * 9 / 16), 100%); border-radius: 20px 20px 0 0; }
+.feed-wrap.wide .feed-nav { left: calc(50% + (100dvh - 32px) * 9 / 32 + 16px); }
+
+/* ---------- right rail: Like, Save, Share, Download, Reflect ---------- */
+/* Always clear of Customize (owner, 12 Oct 2026). The details (.reel-info) start at 7% from the bottom; the row
+   with Customize is about 37 px tall. The rail starts 12 px or more above the row's top. */
+.reel-rail { position: absolute; right: 6px; bottom: calc(7% + 52px); display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.rail-btn {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; width: 52px; min-height: 52px; padding: 2px 0;
+  /* Softer than pure white (owner, 12 Oct 2026), so the rail stays quieter than the ayah. */
+  border: 0; border-radius: 14px; background: none; color: rgba(255, 255, 255, 0.6); font-size: 12px; font-weight: 600; line-height: 1.2;
+  font-variant-numeric: tabular-nums; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+/* Plain white labels, no backing (owner, 12 Oct 2026); the button's text shadow keeps them readable on light video. */
+.rail-btn > span:not(.pct) { font-size: 11px; white-space: nowrap; }
+.rail-btn svg { width: 28px; height: 28px; stroke-width: 1.8; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6)); }
+.rail-btn.like svg { width: 30px; height: 30px; }
+.rail-btn[aria-pressed="true"] svg { fill: currentColor; }
+.rail-btn.like[aria-pressed="true"] { color: #ff5a4f; }
+.rail-btn:disabled { opacity: 0.6; cursor: default; }
+.rail-btn:active:not(:disabled) { background: rgba(255, 255, 255, 0.14); }
+.rail-btn .pct { display: grid; place-items: center; min-width: 28px; height: 28px; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* Scholars' notes beside Reflect (ScholarsNudge.tsx): no backing, the names right-aligned against the faces, the faces
+   next to the icon; a soft ring round the icon while it shows. Reflect's icon sits at a fixed place (its centre 18 px
+   down the button, where the centred layout of the other buttons puts theirs), so the ring and the names line up with it. */
+.rail-reflect { position: relative; }
+.rail-reflect .rail-btn { justify-content: flex-start; padding-top: 4px; }
+.scholars-nudge {
+  position: absolute; right: calc(100% + 4px); top: -4px; display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 0 0 6px;
+  border: 0; background: none; color: #f6f1e6; white-space: nowrap; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.75); cursor: pointer;
+  animation: sn-in 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.scholars-nudge.out { animation: sn-out 0.3s ease both; pointer-events: none; }
+.sn-text { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
+.sn-name { max-width: 170px; overflow: hidden; text-overflow: ellipsis; font-size: 13px; font-weight: 600; animation: sn-name 0.3s ease both; }
+.sn-more { font-size: 11.5px; font-weight: 500; color: rgba(246, 241, 230, 0.85); }
+.sn-faces { display: flex; }
+.sn-faces > span {
+  display: grid; place-items: center; width: 26px; height: 26px; margin-left: -8px; overflow: hidden; border: 1.5px solid rgba(0, 0, 0, 0.35);
+  border-radius: 50%; background: #2f4858; color: #f6f1e6; font-size: 10px; font-weight: 700; text-shadow: none; opacity: 0.5; transition: opacity 0.25s;
+}
+.sn-faces > span:first-child { margin-left: 0; background: #0f5c4d; }
+.sn-faces > span:nth-child(3) { background: #7a6240; }
+.sn-faces > span.on { opacity: 1; }
+.sn-faces img { width: 100%; height: 100%; object-fit: cover; }
+.rail-reflect:has(.scholars-nudge:not(.out))::before {
+  content: ""; position: absolute; left: 50%; top: 18px; width: 40px; height: 40px; border: 1.5px solid rgba(246, 241, 230, 0.55); border-radius: 50%;
+  background: rgba(246, 241, 230, 0.08); transform: translate(-50%, -50%); pointer-events: none; animation: sn-ring 0.5s ease both;
+}
+@keyframes sn-in { from { opacity: 0; transform: translateX(28px); } }
+@keyframes sn-out { to { opacity: 0; transform: translateX(16px); } }
+@keyframes sn-name { from { opacity: 0; transform: translateY(5px); } }
+@keyframes sn-ring { from { opacity: 0; transform: translate(-50%, -50%) scale(0.7); } 60% { transform: translate(-50%, -50%) scale(1.15); } }
+@keyframes sn-fade-in { from { opacity: 0; } }
+@keyframes sn-fade-out { to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .scholars-nudge, .sn-name, .rail-reflect:has(.scholars-nudge:not(.out))::before { animation-name: sn-fade-in; }
+  .scholars-nudge.out { animation-name: sn-fade-out; }
+}
+
+/* ---------- bottom: the ayah, the reciter and Customize (bottom right, under the rail) ---------- */
+/* The canvas draws the "AyahShare.com" mark centred at 3.5% of the height (draw.ts). The details start at twice that, 7%,
+   so the mark sits midway between the reciter row and the bottom edge (owner, 12 Oct 2026). */
+.reel-info {
+  position: absolute; left: 16px; right: 10px; bottom: 7%; display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+  pointer-events: none; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+/* Only the row with Customize runs under the rail; the other lines stay clear of it. */
+.reel-info > :not(.reel-who) { max-width: calc(100% - 70px); }
+/* Why a story was picked (Discover's stories; the reels no longer show it). */
+.reel-reason { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gold-light); }
+.reel-who { display: flex; align-items: center; gap: 10px; min-width: 0; width: 100%; }
+.reel-avatar { flex: none; display: grid; place-items: center; width: 36px; height: 36px; padding: 2px; border-radius: 50%; background: linear-gradient(135deg, #0f5c4d, #d9a648); }
+.reel-avatar img { width: 100%; height: 100%; padding: 5px; border-radius: 50%; background: #fff; }
+.reel-who-text { flex: 0 1 auto; min-width: 0; }
+/* Customize: a small pill on the right of the row, centred with the surah and reciter (the details ignore taps, the pill takes them). */
+.reel-customize {
+  position: relative; flex: none; display: inline-flex; align-items: center; gap: 6px; margin-left: auto; min-height: 34px; padding: 0 12px;
+  border: 0; border-radius: 17px; background: linear-gradient(135deg, var(--gold-light), var(--gold)); color: #2a1d05; font-size: 13px; font-weight: 700;
+  line-height: 1; text-shadow: none; pointer-events: auto; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+/* The pill is 34 px tall; the touch area is 44 px. */
+.reel-customize::before { content: ""; position: absolute; inset: -5px -3px; }
+.reel-customize svg { width: 14px; height: 14px; stroke-width: 2.2; }
+.reel-customize:active { filter: brightness(0.92); }
+.reel-who-text strong { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 15px; font-weight: 700; line-height: 1.3; }
+.reel-reciter { display: flex; align-items: center; gap: 6px; font-size: 13px; opacity: 0.92; }
+.reel-reciter svg { width: 14px; height: 14px; stroke-width: 2.2; }
+.reel-reciter span { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+/* ---------- hints and progress ---------- */
+.feed-wrap .sound-hint { top: calc(114px + env(safe-area-inset-top)); }
+/* Under the mood chips, clear of the translation at the foot of the text card. */
+.swipe-hint {
+  position: absolute; left: 50%; top: calc(150px + env(safe-area-inset-top)); transform: translateX(-50%); display: inline-flex; align-items: center; gap: 6px; min-height: 34px;
+  padding: 0 14px; border-radius: 17px; background: rgba(0, 0, 0, 0.6); font-size: 13px; font-weight: 600; white-space: nowrap; pointer-events: none;
+  animation: swipe-hint 4.5s ease forwards; /* a moment, then gone: it would otherwise sit over the surah header */
+}
+@keyframes swipe-hint { 0% { opacity: 0; } 8%, 75% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
+.swipe-hint svg { width: 16px; height: 16px; stroke-width: 2.2; animation: swipe-nudge 1.6s ease-in-out infinite; }
+@keyframes swipe-nudge { 0%, 100% { transform: translateY(2px); } 50% { transform: translateY(-3px); } }
+.reel-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(255, 255, 255, 0.25); pointer-events: none; }
+.reel-progress i { display: block; height: 100%; background: var(--gold-light); transform: scaleX(0); transform-origin: left center; }
+/* New reels: pulled down on the first reel (the indicator follows the finger), and the pill after a few reels. */
+.pull-refresh {
+  position: absolute; z-index: 4; left: 50%; top: calc(118px + env(safe-area-inset-top)); display: inline-flex; align-items: center; gap: 8px;
+  min-height: 36px; padding: 0 14px; border-radius: 18px; background: rgba(0, 0, 0, 0.62); color: #fff; font-size: 13px; font-weight: 600;
+  white-space: nowrap; pointer-events: none; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+.pull-refresh svg { width: 18px; height: 18px; stroke-width: 2.2; transition: transform 0.15s; }
+.pull-refresh[data-ready] svg { transform: rotate(180deg); }
+.new-reels {
+  position: absolute; z-index: 4; left: 50%; top: calc(118px + env(safe-area-inset-top)); transform: translateX(-50%); display: inline-flex; align-items: center;
+  gap: 6px; min-height: 38px; padding: 0 16px; border: 0; border-radius: 19px; background: linear-gradient(135deg, var(--gold-light), var(--gold));
+  color: #2a1d05; font-size: 13px; font-weight: 700; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  animation: new-reels 4s ease both; /* Feed.tsx PILL_MS: in, a while, out */
+}
+.new-reels svg { width: 16px; height: 16px; stroke-width: 2.4; }
+@keyframes new-reels {
+  0% { opacity: 0; transform: translate(-50%, -8px); }
+  8%, 88% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -8px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  @keyframes new-reels { 0%, 100% { opacity: 0; } 8%, 88% { opacity: 1; } }
+}
+.feed-wrap.wide .pull-refresh, .feed-wrap.wide .new-reels { top: 132px; }
+/* The browser's own pull-to-refresh (and page bounce) never starts from the reels. */
+.feed-wrap .reels { overscroll-behavior: none; }
+
+/* The one-time hint under the settings button: a small bubble, its tail pointing up at the button. */
+.meaning-coach {
+  position: absolute; z-index: 5; top: calc(100% + 12px); right: 0; width: max-content; max-width: min(240px, calc(100vw - 32px));
+  padding: 9px 13px; border-radius: 12px; background: rgba(0, 0, 0, 0.78); color: #fff; font-size: 13px; font-weight: 600; line-height: 1.35;
+  text-shadow: none; pointer-events: none; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  animation: coach-in 0.25s ease both;
+}
+.meaning-coach::before { content: ""; position: absolute; top: -6px; right: 16px; width: 12px; height: 12px; background: inherit; transform: rotate(45deg); border-radius: 2px; }
+@keyframes coach-in { from { opacity: 0; transform: translateY(-4px); } }
+/* "Meaning on": for a moment after the switch is tapped. */
+.voice-hint {
+  position: absolute; z-index: 3; left: 50%; top: calc(156px + env(safe-area-inset-top)); transform: translateX(-50%); max-width: calc(100% - 32px);
+  padding: 7px 14px; border-radius: 99px; background: rgba(0, 0, 0, 0.62); color: #fff; font-size: 13px; font-weight: 600; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis; pointer-events: none; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  animation: voice-hint 2.2s ease forwards;
+}
+@keyframes voice-hint { 0% { opacity: 0; } 10%, 80% { opacity: 1; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .swipe-hint svg { animation: none; }
+  .voice-hint { animation: none; }
+  .meaning-coach { animation: none; }
+  .pull-refresh svg { transition: none; }
+}
+
+/* ---------- a whole surah (surah.ts): back, the surah and how far it is, a thin line under them; the end screen ---------- */
+.reels-back {
+  flex: none; display: grid; place-items: center; width: 44px; height: 44px; margin-left: -10px; padding: 0; border: 0; background: none;
+  color: #fff; filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
+}
+.reels-back svg { width: 24px; height: 24px; stroke-width: 2; }
+/* The mark beside Back, then the surah's name over "Ayah 2 of 30"; the details at the bottom show only the reciter. */
+.reels-bar .reels-surah-mark { width: 34px; height: 34px; margin-left: -4px; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35); }
+/* Small, like a story's title (stories.css .story-title): how far in words, then the surah's name. */
+.reels-surah { flex: 1 1 auto; min-width: 0; margin: 0 auto 0 2px; display: flex; flex-direction: column; gap: 1px; color: #fff; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7); }
+.reels-surah .reel-reason { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 10.5px; }
+.reels-surah strong { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 15px; font-weight: 700; line-height: 1.3; }
+.surah-progress { height: 3px; margin: 2px 8px 8px 0; border-radius: 2px; background: rgba(255, 255, 255, 0.22); overflow: hidden; pointer-events: none; }
+.surah-progress i { display: block; height: 100%; background: #f6f1e6; transform-origin: left; transition: transform 0.4s ease; }
+.surah-end {
+  position: absolute; z-index: 5; inset: 0; display: flex; flex-direction: column; padding: calc(8px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom));
+  background: linear-gradient(170deg, #12705c, #0a4237 75%); color: #f6f1e6; overflow-y: auto;
+}
+.feed-wrap.wide .surah-end { inset: 16px auto 16px 50%; width: min(calc((100dvh - 32px) * 9 / 16), 100%); transform: translateX(-50%); border-radius: 20px; }
+.surah-end-close { align-self: flex-start; display: grid; place-items: center; width: 44px; height: 44px; margin-left: -10px; padding: 0; border: 0; background: none; color: inherit; }
+.surah-end-close svg { width: 24px; height: 24px; }
+.surah-end-head { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: auto 12px 0; text-align: center; }
+/* Amiri Quran's marks reach well below the line (the kasra): room under the name so they never touch the heading. */
+.surah-end-ar { padding-bottom: 18px; font: 44px/1.6 var(--font-quran); }
+.surah-end-ar.small { flex: none; padding-bottom: 0; font-size: 22px; line-height: 1.4; }
+.surah-end-head h2 { margin: 0; font: 700 24px/1.25 var(--font-display); letter-spacing: -0.2px; text-transform: none; text-wrap: balance; color: inherit; }
+.surah-end .nowrap { white-space: nowrap; }
+.surah-end-head p { margin: 0; font-size: 14.5px; color: rgba(246, 241, 230, 0.82); }
+.surah-end-next { display: flex; align-items: center; gap: 14px; margin-top: 40px; padding: 16px; border-radius: 16px; background: rgba(0, 0, 0, 0.22); }
+.surah-end-count {
+  flex: none; display: grid; place-items: center; width: 52px; height: 52px; border: 3px solid rgba(246, 241, 230, 0.3); border-radius: 50%;
+  font: 700 20px var(--font-display);
+}
+.surah-end-next-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.surah-end-next-text > span { font-size: 13px; color: rgba(246, 241, 230, 0.78); }
+.surah-end-next-text strong { font-size: 16px; }
+.surah-end-actions { display: grid; gap: 10px; margin-top: auto; padding-top: 24px; }
+.surah-end-actions button {
+  display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 50px; padding: 0 20px; border-radius: 999px;
+  font: 600 15px var(--font-ui); color: #f6f1e6; background: none; border: 1px solid rgba(246, 241, 230, 0.35);
+}
+.surah-end-actions .surah-end-play { border: 0; background: #f6f1e6; color: #0a4237; font-weight: 700; font-size: 16px; }
+.surah-end-actions .surah-end-play svg { width: 16px; height: 16px; }
+.surah-end-actions .surah-end-stop { min-height: 44px; border: 0; }
+
+/* My preferred reciter (Language and audio, and asked once on the first Reels): the mix first, then each reciter. */
+.reciter-sheet .hint { margin: 0 2px 12px; font-size: 14px; line-height: 1.45; color: var(--muted); }
+.reciter-choices { display: grid; }
+.reciter-choices [role="radio"] {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; padding: 0 4px; border: 0;
+  border-bottom: 1px solid var(--line); background: none; color: var(--ink); font-size: 15px; text-align: start;
+}
+.reciter-choices > :last-child { border-bottom: 0; }
+.reciter-choices [role="radio"][aria-checked="true"] { font-weight: 600; }
+.reciter-choices .reciter-mix { min-height: 60px; }
+.reciter-choices .reciter-mix > span { display: grid; gap: 2px; }
+.reciter-choices .reciter-mix strong { font-weight: inherit; }
+.reciter-choices .reciter-mix span span { font-size: 13px; font-weight: 400; color: var(--muted); }
+.reciter-choices [role="radio"] svg { flex: none; width: 20px; height: 20px; stroke-width: 2.4; color: var(--accent); }
+.reel-settings-sheet .dd-row + .dd-row { margin-top: 8px; }
+
+/* A whole surah going on by itself (Feed.tsx fadeTo): the reels fade out to black, the next one is put in place, then
+   they fade in again; the top bar (the surah and how far it is) stays. */
+.feed-wrap .reels { transition: opacity 0.4s ease; }
+.feed-wrap .reels[data-fade="out"] { opacity: 0; transition-duration: 0.35s; }
+@media (prefers-reduced-motion: reduce) { .feed-wrap .reels { transition: none; } }

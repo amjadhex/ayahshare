@@ -1,0 +1,11 @@
+/* The brand lockup and mark: the light-background file by default, the dark-background one in dark mode. */
+.home-logo, .home-mark { display: inline-flex; line-height: 0; }
+.home-logo img { height: 29px; width: auto; }
+.home-mark img { max-width: 100%; height: auto; }
+.home-logo-dark { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .home-logo-light { display: none; }
+  :root:not([data-theme="light"]) .home-logo-dark { display: block; }
+}
+:root[data-theme="dark"] .home-logo-light { display: none; }
+:root[data-theme="dark"] .home-logo-dark { display: block; }

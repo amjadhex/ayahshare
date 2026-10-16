@@ -1,0 +1,115 @@
+/* ======================================================================================================
+   Share (Share.tsx, Share v2): dark on every screen size, like the editor (its colour tokens are redefined here, and
+   ui/App.tsx darkens the page behind the browser's bars). Phones: the still, its caption and the actions in one centred
+   column; tablets and computers: the still on the left, the actions on the right. The ring and the ✓ badge on the
+   still are shared with the Export sheet (export.css).
+   ====================================================================================================== */
+.share {
+  color-scheme: dark;
+  --bg: var(--editor-bg); --surface: #141a18; --surface-2: #1d2523; --surface-3: #26302d; --line: #2c3633;
+  --ink: #ffffff; --muted: #a9b8b3; --soft: #d9e3df; --accent: var(--gold-light); --accent-ink: var(--gold-ink);
+  --emerald: #0f5c4d; --emerald-ring: #2f9e83;
+  min-height: 100dvh; display: flex; flex-direction: column; background: var(--bg); color: var(--ink);
+  font-size: 15px; line-height: 1.4;
+}
+.share-top { flex: none; display: flex; align-items: center; gap: 12px; height: calc(60px + env(safe-area-inset-top)); padding: env(safe-area-inset-top) 10px 0; }
+.share-top h1 { margin: 0; font: 700 20px var(--font-display); letter-spacing: 0; text-transform: none; color: var(--ink); }
+.share-back { display: grid; place-items: center; flex: none; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: var(--surface-2); color: var(--ink); }
+.share-back svg { width: 22px; height: 22px; stroke-width: 2.2; }
+.share-back:hover { background: var(--surface-3); }
+
+.share-body {
+  flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 28px;
+  padding: 8px max(24px, env(safe-area-inset-right)) calc(28px + env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
+}
+/* Centred, but never cut off at the top on a short screen. */
+.share-head { margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.share-panel { margin-bottom: auto; display: flex; flex-direction: column; width: 100%; max-width: 420px; align-self: center; }
+
+/* The still: as large as the screen allows (236 px wide on a 390 × 844 phone). */
+.share-thumb.xp-thumb {
+  --w: clamp(150px, calc((100dvh - 400px) * 9 / 16), 236px);
+  width: var(--w); border-radius: 18px; background: #000; box-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
+}
+.share-thumb.xp-thumb[data-orientation="square"] { width: min(100%, clamp(200px, calc(100dvh - 420px), 300px)); }
+.share-thumb.xp-thumb[data-orientation="landscape"] { width: min(100%, 360px); }
+.share-caption { font-size: 13px; color: var(--muted); text-align: center; }
+
+/* Edit, on the still's corner (a 44 px target around a small pill). */
+.share-edit {
+  position: absolute; right: 6px; top: 6px; display: flex; align-items: center; min-height: 44px; padding: 0 6px;
+  border: 0; background: none; color: #fff;
+}
+.share-edit > span {
+  display: flex; align-items: center; gap: 5px; height: 32px; padding: 0 12px 0 10px; border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.28); background: rgba(11, 15, 14, 0.72); font-size: 13px; font-weight: 600;
+}
+.share-edit svg { width: 14px; height: 14px; stroke-width: 2.2; }
+.share-edit:hover > span { background: rgba(11, 15, 14, 0.88); }
+
+/* The actions */
+.share-stack { display: flex; flex-direction: column; gap: 12px; }
+.share-btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 56px; padding: 0 20px; border: 0; border-radius: 28px;
+  font: inherit; font-size: 16px; font-weight: 600; color: var(--ink); background: var(--surface-2); text-decoration: none;
+}
+.share-btn svg { width: 20px; height: 20px; stroke-width: 2.2; }
+.share-btn.emerald { background: var(--emerald); box-shadow: inset 0 0 0 1px var(--emerald-ring); font-size: 17px; font-weight: 700; }
+.share-btn.gold { background: var(--gold-light); color: var(--gold-ink); font-size: 17px; font-weight: 700; }
+.share-btn:not(:disabled):active, .share-save-main:not(:disabled):active { transform: scale(0.98); }
+.share-btn:disabled, .share-save button:disabled, .share-quiet:disabled { opacity: 0.45; cursor: default; }
+@media (hover: hover) {
+  .share-btn.emerald:hover:not(:disabled) { background: #127060; }
+  .share-btn.gold:hover:not(:disabled) { background: #f6dea0; }
+  .share-btn.plain:hover, .share-save:hover { background: var(--surface-3); }
+}
+
+/* Save to phone, with the HD toggle inside it on the right (the label stays centred in the whole button). */
+.share-save { display: flex; align-items: center; min-height: 56px; border-radius: 28px; background: var(--surface-2); }
+.share-save-main {
+  flex: 1; min-width: 0; min-height: 56px; padding: 0 0 0 58px; border: 0; border-radius: 28px; background: transparent; color: var(--ink);
+  font: inherit; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.share-save-main svg { flex: none; width: 20px; height: 20px; stroke-width: 2.2; }
+.share-hd { flex: none; display: grid; place-items: center; width: 58px; height: 56px; padding: 0; border: 0; border-radius: 0 28px 28px 0; background: transparent; }
+.share-hd span {
+  display: flex; align-items: center; height: 26px; padding: 0 8px; border-radius: 13px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.3px; color: var(--muted); box-shadow: inset 0 0 0 1.5px #6b7a75;
+}
+.share-hd[aria-pressed="true"] span { background: var(--gold-light); color: var(--gold-ink); box-shadow: none; }
+
+/* Quiet text buttons: Copy link, Cancel, Share again, Back, Save instead. */
+.share-quiet {
+  align-self: center; min-height: 44px; padding: 0 12px; border: 0; border-radius: 10px; background: none; color: var(--soft);
+  font: inherit; font-size: 14px; font-weight: 600; text-decoration: underline; text-underline-offset: 2px;
+}
+.share-quiet.muted { color: var(--muted); }
+.share-quiet:hover:not(:disabled) { color: var(--ink); }
+.share-status { margin: 0 0 4px; text-align: center; font-size: 14px; color: var(--muted); overflow-wrap: anywhere; }
+
+/* Making */
+.share-making { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.share-making-title { margin: 0; text-align: center; font-size: 16px; font-weight: 600; }
+
+/* Ready */
+.share-result { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-bottom: 4px; text-align: center; }
+.share-outcome { display: flex; align-items: center; gap: 8px; margin: 0; font: 700 20px var(--font-display); }
+.share-outcome svg { flex: none; width: 22px; height: 22px; stroke: #7fd6bf; stroke-width: 3; }
+.share-line { margin: 0; font-size: 13px; color: var(--muted); text-align: center; }
+.share-line > svg { display: inline-block; width: 14px; height: 14px; margin-right: 6px; vertical-align: -2px; color: var(--gold); }
+.share-login { min-height: 32px; margin: -6px 0; padding: 0; border: 0; background: none; color: var(--gold-light); font: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+
+/* Error */
+.share-error { margin: 0; text-align: center; font-size: 15px; line-height: 1.45; color: var(--soft); }
+
+/* Tablets and computers: the still on the left, the actions on the right. */
+@media (min-width: 760px) {
+  .share-top { height: 64px; padding: 0 20px; }
+  .share-body { flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: center; gap: 64px; padding: 32px 24px; }
+  .share-head, .share-panel { margin: 0; }
+  .share-panel { flex: 0 1 360px; min-width: 0; align-self: center; }
+  .share-thumb.xp-thumb { --w: clamp(220px, calc((100dvh - 200px) * 9 / 16), 340px); border-radius: 20px; }
+  .share-thumb.xp-thumb[data-orientation="square"] { width: clamp(260px, calc(100dvh - 240px), 420px); }
+  .share-thumb.xp-thumb[data-orientation="landscape"] { width: min(100%, 560px); }
+}
+@media (prefers-reduced-motion: reduce) { .share-btn:active, .share-save-main:active { transform: none; } }

@@ -1,0 +1,25 @@
+{
+  "name": "quran-design-api",
+  "private": true,
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "npm --prefix ../web run build && wrangler deploy",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "db:migrate": "wrangler d1 migrations apply quran-design --remote",
+    "db:migrate:local": "wrangler d1 migrations apply quran-design --local",
+    "types": "wrangler types --strict-vars=false"
+  },
+  "dependencies": {
+    "hono": "^4.13.13",
+    "jose": "^6.2.12"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.23.0",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.11",
+    "wrangler": "^4.148.0"
+  }
+}

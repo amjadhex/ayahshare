@@ -1,0 +1,29 @@
+.env
+.env.*
+.venv/
+__pycache__/
+node_modules/
+dist/
+.wrangler/
+.dev.vars
+mvp/data/
+pipeline/out/
+pipeline/cache/
+.DS_Store
+brand/tools/fonts/
+# Large media and app binaries stay out of git
+*.mp4
+*.mov
+*.webm
+*.apk
+*.aab
+*.ipa
+*.zip
+# Rendered marketing images (posters, screenshots, store shots) — regenerate from their sources
+marketing/**/*.png
+marketing/**/*.jpg
+marketing/**/*.jpeg
+marketing/**/*.webp
+
+# Test output
+apps/web/.vitest/

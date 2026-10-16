@@ -1,0 +1,10 @@
+/* A reciter row: choosing them, and their sample (ReciterSample.tsx) at the end. */
+.reciter-choices .choice-row, .srh-choices .choice-row { display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--line); }
+.reciter-choices .choice-row > [role="radio"], .srh-sheet .srh-choices .choice-row > [role="radio"] { flex: 1; min-width: 0; border-bottom: 0; }
+.choice-row:last-child { border-bottom: 0; }
+.sample-btn {
+  flex: none; display: grid; place-items: center; width: 40px; height: 40px; margin: 2px 0; padding: 0; border: 1px solid var(--line);
+  border-radius: 50%; background: var(--surface); color: var(--accent);
+}
+.sample-btn svg { width: 16px; height: 16px; }
+.sample-btn[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }

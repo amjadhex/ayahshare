@@ -1,0 +1,60 @@
+/* The translation picker (TranslationPicker.tsx). Colour tokens only, so it is dark in the editor and follows the page
+   theme in Preferences. Rows and buttons are at least 44 px tall. */
+.trp { display: flex; flex-direction: column; min-width: 0; }
+.trp-search { position: sticky; top: 0; z-index: 1; box-shadow: 0 -8px 0 var(--surface); }
+.trp .search.small { height: 44px; margin-bottom: 6px; }
+
+.trp-bar { display: flex; align-items: center; gap: 8px; min-height: 44px; margin: 4px 0 2px; }
+.trp-title { flex: 1; min-width: 0; display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 8px; margin: 0; font-size: 16px; font-weight: 700; }
+.trp-title .trp-english { font-size: 13px; font-weight: 500; color: var(--muted); }
+.trp-switch, .trp-back { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0 4px; border: 0; background: none;
+  color: var(--accent); font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer; }
+.trp-switch svg, .trp-back svg { width: 18px; height: 18px; }
+.trp-back { margin-inline-start: -6px; }
+
+.trp-heading, .trp-subhead { margin: 14px 0 2px; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
+.trp-subhead { display: flex; align-items: baseline; gap: 6px; text-transform: none; letter-spacing: 0; font-size: 13px; }
+.trp-subhead .trp-native { color: var(--ink); }
+.trp-section + .trp-section { margin-top: 6px; }
+
+.trp-group { display: flex; flex-direction: column; }
+.trp-row { position: relative; display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 6px 4px; border-bottom: 1px solid var(--line);
+  font-size: 15px; cursor: pointer; }
+.trp-row input { position: absolute; width: 1px; height: 1px; margin: 0; opacity: 0; pointer-events: none; }
+.trp-dot { flex: none; box-sizing: border-box; width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--muted); }
+.trp-row input:checked + .trp-dot { border: 6px solid var(--accent); }
+.trp-row:has(input:checked) .trp-name { font-weight: 600; }
+.trp-row:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 8px; }
+.trp-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.trp-name { overflow-wrap: anywhere; }
+.trp-detail { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; color: var(--muted); font-size: 12.5px; overflow-wrap: anywhere; }
+.trp-voice { background: none; box-shadow: inset 0 0 0 1px var(--accent); }
+.trp-badge { display: inline-block; padding: 1px 7px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); font-size: 11.5px; font-weight: 600; }
+
+.trp-langs { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
+.trp-lang { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 52px; padding: 6px 4px; border: 0; border-bottom: 1px solid var(--line);
+  background: none; color: var(--ink); text-align: start; font-size: 15px; cursor: pointer; }
+.trp-lang:hover .trp-native { color: var(--accent); }
+.trp-lang:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 8px; }
+.trp-lang[aria-current="true"] { background: var(--accent-soft); border-radius: 8px; }
+.trp-lang-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.trp-lang-names { min-width: 0; display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 8px; }
+.trp-lang-hits { color: var(--muted); font-size: 12.5px; overflow-wrap: anywhere; }
+.trp-mine-empty { margin: 4px 4px 8px; }
+.trp-native { font-weight: 600; }
+.trp-english { color: var(--muted); font-size: 13px; }
+.trp-lang-meta { flex: none; display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 12.5px; }
+.trp-lang > svg { flex: none; width: 16px; height: 16px; color: var(--muted); }
+.trp-empty { margin: 12px 0; }
+
+/* A picker in a sheet (Preferences' default translation, the option sheets of PickerRow): a bottom sheet on phones, a centred
+   dialog on larger screens. */
+dialog.sheet.trp-sheet { max-height: min(80dvh, calc(100dvh - 80px)); }
+@media (min-width: 760px) {
+  dialog.sheet.trp-sheet { inset: 0; margin: auto; width: min(560px, calc(100vw - 32px)); max-height: min(80vh, 720px); border-radius: var(--radius);
+    box-shadow: var(--shadow); }
+  dialog.sheet.trp-sheet:not([open]) { transform: translateY(24px); }
+  @starting-style { dialog.sheet.trp-sheet[open] { transform: translateY(24px); } }
+  dialog.sheet.trp-sheet .sheet-grab { display: none; }
+  dialog.sheet.trp-sheet .sheet-head { padding-top: 14px; }
+}

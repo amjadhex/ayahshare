@@ -1,0 +1,8 @@
+/* Credits (ui/screens/Credits.tsx): the Settings look (settings.css) with two-line source rows. */
+.cr-intro { margin: 0 4px; font-size: 14px; line-height: 1.5; color: var(--muted); }
+.cr-text { display: grid; gap: 2px; min-width: 0; padding: 10px 0; }
+.cr-text strong { font-size: 15px; font-weight: 600; color: var(--ink); overflow-wrap: anywhere; }
+.cr-text small { font-size: 12.5px; line-height: 1.4; color: var(--muted); overflow-wrap: anywhere; }
+.cr-note { margin: 8px 4px 0; font-size: 12.5px; line-height: 1.5; color: var(--muted); overflow-wrap: anywhere; }
+.cr-made { gap: 4px; padding-top: 0; }
+.cr-made .set-heading { margin: 0; }

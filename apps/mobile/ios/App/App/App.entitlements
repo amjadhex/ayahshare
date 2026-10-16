@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Universal Links: https://<site>/s/<code> opens the app. The site serves /.well-known/apple-app-site-association
+	     (apps/api/src/routes/wellknown.ts), which names this app once APPLE_TEAM_ID is set. Only the apex: www.ayahshare.com
+	     301-redirects to it, and Universal Links do not follow redirects. -->
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:ayahshare.com</string>
+	</array>
+	<!-- Sign in with Apple (the login page's first button in the iOS app; apps/web/src/platform-native.ts). -->
+	<key>com.apple.developer.applesignin</key>
+	<array>
+		<string>Default</string>
+	</array>
+</dict>
+</plist>

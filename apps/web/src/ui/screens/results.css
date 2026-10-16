@@ -1,0 +1,88 @@
+/* Results: the refine box and the grid of thumbnails. Classes res-*. */
+.res { min-height: 100dvh; display: flex; flex-direction: column; }
+.res-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.res-head { position: sticky; top: 0; z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line);
+  padding: env(safe-area-inset-top) max(12px, env(safe-area-inset-right)) 12px max(12px, env(safe-area-inset-left)); }
+.res-head-in { max-width: 1100px; margin: 0 auto; }
+.res-bar { height: 52px; display: flex; align-items: center; justify-content: space-between; }
+.res-back { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; background: none; color: var(--ink); }
+.res-back svg { width: 22px; height: 22px; }
+.res-bar-end { width: 44px; }
+.app[data-layout="desktop"] .res-bar .home-logo { display: none; } /* the side bar already shows the name */
+.res-refine { display: flex; align-items: center; gap: 8px; height: 48px; margin: 4px 4px 0; padding: 0 5px 0 16px; border-radius: 24px; background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--ink) 14%, var(--bg)); box-shadow: var(--shadow); transition: border-color 0.15s; }
+.app:not([data-layout="phone"]) .res-refine { max-width: 640px; margin-inline: auto; }
+.res-refine:focus-within { border-color: var(--accent); }
+.res-refine > svg { color: var(--muted); }
+.res-refine input { flex: 1; min-width: 0; height: 100%; border: 0; outline: none; background: transparent; font-size: 15px; color: var(--ink); }
+.res-refine input::placeholder { color: var(--muted); opacity: 1; }
+.res-go { display: grid; place-items: center; width: 44px; height: 44px; margin-block: -3px; padding: 0; border: 0; border-radius: 50%; background: var(--accent); color: var(--accent-ink); }
+.res-go svg { width: 18px; height: 18px; stroke-width: 2.2; }
+
+.res-body { flex: 1; width: 100%; max-width: 1100px; margin: 0 auto; padding-bottom: 28px; }
+.res-title-row { display: flex; align-items: center; gap: 12px; padding: 14px max(16px, env(safe-area-inset-left)) 10px max(16px, env(safe-area-inset-right)); }
+.res-title { flex: 1; min-width: 0; margin: 0; font: 700 16px/1.3 var(--font-ui); letter-spacing: 0; text-transform: none; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.res-count { flex: none; font-size: 13px; color: var(--muted); }
+.res-title-row .lang-btn { flex: none; }
+
+.res-grid { list-style: none; margin: 0; padding: 0 max(16px, env(safe-area-inset-left)) 0 max(16px, env(safe-area-inset-right)); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+@media (min-width: 760px) { .res-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; } }
+@media (min-width: 1180px) { .res-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+/* a tile: the suggested background, the ayah over it, the reference and the share count at the bottom */
+.res-tile { position: relative; container-type: inline-size; aspect-ratio: 3 / 4; border-radius: 16px; overflow: hidden; background: var(--editor-bg); color: #fff; }
+.res-open { position: absolute; inset: 0; display: block; padding: 0; border: 0; background: transparent; color: inherit; text-align: start; }
+.res-bg, .res-bg img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.res-bg { background: linear-gradient(160deg, var(--emerald-700), var(--emerald-900)); }
+.res-bg img, .res-bg video { object-fit: cover; }
+/* the preview fades in over the thumbnail once it plays (tilePlay.ts sets data-on) */
+.res-bg video { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.3s; }
+.res-bg video[data-on] { opacity: 1; }
+.res-open::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0, 0, 0, 0.32), rgba(0, 0, 0, 0.44) 55%, rgba(0, 0, 0, 0.76)); }
+/* the reel's first frame (tileFrame.ts): it replaces the plain text */
+.res-frame, .res-frame canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.res-glass { position: absolute; -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); pointer-events: none; }
+.res-tile[data-frame] .res-open::before { display: none; }
+/* the frame brings the reel's own shade; a little more under the surah line */
+.res-tile[data-frame] .res-bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 75%, rgba(0, 0, 0, 0.4)); }
+.res-tile[data-frame] .res-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.res-open:focus-visible { outline-offset: -3px; outline-color: #fff; }
+.res-text { position: absolute; inset: 24cqw 6cqw 26cqw; display: flex; flex-direction: column; justify-content: center; gap: 4px; text-align: center; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7), 0 0 2px rgba(0, 0, 0, 0.35); }
+.res-ar { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-family: var(--font-quran); font-size: clamp(15px, 9cqw, 21px); line-height: 1.9; }
+.res-ar.res-line { height: 1.9em; width: 70%; align-self: center; border-radius: 6px; background: linear-gradient(90deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.1)); background-size: 200% 100%; animation: res-shimmer 1.2s linear infinite; }
+.res-tr { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-size: clamp(11px, 6.3cqw, 14px); line-height: 1.35; }
+.res-meta { position: absolute; left: 6cqw; right: 6cqw; bottom: 6cqw; display: flex; flex-direction: column; gap: 1px; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6); }
+.res-ref { font-size: clamp(12px, 6.5cqw, 14px); font-weight: 700; }
+.res-shares { font-size: clamp(11px, 6cqw, 12.5px); opacity: 0.9; }
+
+/* round buttons in the corners: 44px to hit, 34px to see */
+.res-corner { position: absolute; top: 0; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; background: none; color: #fff; }
+.res-corner span { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: rgba(0, 0, 0, 0.4); }
+.res-corner svg { width: 17px; height: 17px; }
+.res-corner:focus-visible { outline-color: #fff; outline-offset: -3px; }
+.res-reflect { left: 0; }
+.res-fav { right: 0; }
+.res-fav[aria-pressed="true"] { color: #ff5a4f; }
+.res-fav[aria-pressed="true"] svg { fill: currentColor; }
+
+.res-skeleton { background: linear-gradient(90deg, var(--surface-3), var(--surface-2), var(--surface-3)); background-size: 200% 100%; animation: res-shimmer 1.2s linear infinite; }
+@keyframes res-shimmer { to { background-position: -200% 0; } }
+
+.res-note { margin: 0; padding: 14px max(16px, env(safe-area-inset-left)); font-size: 14px; color: var(--muted); }
+.res-failed { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.res-failed p { margin: 0; }
+
+.res-foot { padding: 22px max(16px, env(safe-area-inset-left)) 8px; text-align: center; }
+.res-foot p { margin: 0; font-size: 14px; color: var(--muted); }
+.res-foot .report-link { margin: 0 auto 14px; }
+.res-pick { min-height: 44px; margin-top: 10px; padding: 0 20px; border: 0; border-radius: 22px; background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.res-foot > .res-pick:first-child { margin-top: 0; }
+
+/* the next page: a button, a small loading row while it comes */
+.res-more { display: flex; justify-content: center; align-items: center; min-height: 56px; padding: 12px max(16px, env(safe-area-inset-left)) 0; }
+.res-more .btn.res-more-btn { min-height: 44px; padding: 0 20px; border-radius: 22px; } /* a finger-sized target */
+.res-loading { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 14px; color: var(--muted); }
+.res-spinner { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--line); border-top-color: var(--accent); animation: spin 0.8s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) { .res-refine { transition: none; } .res-skeleton, .res-ar.res-line { animation: none; } .res-spinner { animation-duration: 2.4s; } }

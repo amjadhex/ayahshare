@@ -1,0 +1,77 @@
+{
+  "surah": 2,
+  "name": "Al-Baqara",
+  "arabicName": "سورة البقرة",
+  "intro": [
+    {
+      "title": "Intro",
+      "text": "Placeholder introduction."
+    }
+  ],
+  "ayahs": [
+    {
+      "numberInSurah": 1,
+      "summary": "Summary of the first ayah."
+    },
+    {
+      "numberInSurah": 2,
+      "summary": ""
+    },
+    {
+      "numberInSurah": 8,
+      "summary": ""
+    },
+    {
+      "numberInSurah": 9,
+      "summary": "Summary of the ninth ayah.\n\n\tIts second paragraph."
+    },
+    {
+      "numberInSurah": 30,
+      "summary": "Summary with no notes."
+    }
+  ],
+  "notes": [
+    {
+      "n": 1,
+      "text": "Note one, alone for 2:1.",
+      "from": 1,
+      "to": 1,
+      "ayah": 1
+    },
+    {
+      "n": 11,
+      "text": "First note of the block, with <script>alert(1)</script> & an ampersand.\n\n\tIts second paragraph.",
+      "from": 8,
+      "to": 20,
+      "ayah": 8
+    },
+    {
+      "n": 12,
+      "text": "Second note of the block.",
+      "from": 8,
+      "to": 20,
+      "ayah": 9
+    },
+    {
+      "n": 13,
+      "text": "Third note, then a quoted passage:\n\nابجد هوز حطي كلمن",
+      "from": 8,
+      "to": 20,
+      "ayah": null
+    },
+    {
+      "n": 14,
+      "text": "Note for 2:8–20 as well.",
+      "from": 8,
+      "to": 20,
+      "ayah": null
+    },
+    {
+      "n": 21,
+      "text": "A note for the next block.",
+      "from": 21,
+      "to": 22,
+      "ayah": 21
+    }
+  ]
+}

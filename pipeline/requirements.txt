@@ -1,0 +1,9 @@
+# Offline content pipeline (see README.md). Python 3.11+; ffmpeg on PATH for the background and reciter steps.
+numpy
+requests
+python-dotenv
+regex
+# Only for own_reciter.py (forced alignment) and the local embedding evaluations:
+torch
+transformers
+sentence-transformers

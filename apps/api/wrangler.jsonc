@@ -1,0 +1,105 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "quran-design",
+  // Your domain, attached as a Workers custom domain (optional; workers.dev works on its own):
+  // "routes": [{ "pattern": "example.com", "custom_domain": true }],
+  "workers_dev": true,
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  // The web app (apps/web/dist) is served as static assets; these paths go to the Worker first.
+  "assets": {
+    "directory": "../web/dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    // /data/clips.json and /data/bg/* pass through the Worker so clips hidden in admin drop out at once.
+    // /.well-known/* are the app-link files for the iOS / Android apps (src/routes/wellknown.ts).
+    // / is the landing page; the app itself is at /app (src/index.ts).
+    "run_worker_first": ["/", "/api/*", "/qapi/*", "/audio/*", "/media/*", "/s/*", "/admin/api/*", "/data/clips.json", "/data/bg/*", "/.well-known/*"]
+  },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "quran-design", "database_id": "REPLACE_WITH_YOUR_D1_DATABASE_ID", "migrations_dir": "migrations" }
+  ],
+  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "quran-design-media" }],
+  // 384-d Gemini Embedding 2 vectors (EMBED_MODEL/EMBED_DIM, pipeline/a2_index.py and a4_publish.py). The old 256-d
+  // Workers AI indexes quran-design-ayahs / quran-design-clips are unused and can be deleted.
+  "vectorize": [
+    { "binding": "AYAHS_INDEX", "index_name": "quran-design-ayahs-v2" },
+    { "binding": "CLIPS_INDEX", "index_name": "quran-design-clips-v2" }
+  ],
+  // Per-client limits per minute (IPv4 address or IPv6 /64, src/lib/http.ts), generous because mobile carriers put many
+  // users behind one IP (CGNAT). Luna: full searches that miss both caches and would call Luna (over it they fall back
+  // to the embedding order), so one client cannot spend the shared daily Luna cap. Events: one tab sends at most ~12
+  // batches a minute. The code falls back to a per-isolate counter with the same limits when these are not bound.
+  "ratelimits": [
+    { "name": "SEARCH_LIMITER", "namespace_id": "1001", "simple": { "limit": 300, "period": 60 } },
+    { "name": "LUNA_LIMITER", "namespace_id": "1004", "simple": { "limit": 20, "period": 60 } },
+    { "name": "EVENTS_LIMITER", "namespace_id": "1002", "simple": { "limit": 60, "period": 60 } },
+    { "name": "WRITE_LIMITER", "namespace_id": "1003", "simple": { "limit": 60, "period": 60 } },
+    // Email sign-in (POST /api/auth/email/start and /verify together); each address also has its own limits in D1.
+    { "name": "AUTH_LIMITER", "namespace_id": "1005", "simple": { "limit": 20, "period": 60 } }
+  ],
+  // Email sign-in codes go out through Cloudflare Email Sending (src/lib/email.ts; ayahshare.com is onboarded, Workers
+  // Paid). Email sign-in is offered once the AUTH_CODE_SECRET secret is set too (/api/config emailSignIn).
+  "send_email": [{ "name": "EMAIL", "allowed_sender_addresses": ["hello@ayahshare.com"] }],
+  // Nightly snapshot of yesterday's D1 numbers into daily_stats and pruning (src/rollup.ts); every 15 minutes, the web's
+  // daily reminders that are due (src/reminders.ts).
+  "triggers": { "crons": ["30 0 * * *", "*/15 * * * *"] },
+  // Raw-event archive (3 months); the admin metrics come from D1 counters, not from here.
+  "analytics_engine_datasets": [{ "binding": "EVENTS", "dataset": "quran_design_events" }],
+  "vars": {
+    // The product's name: the web app's title, the branding line on every design ("Created with …"), share pages.
+    "APP_NAME": "AyahShare",
+    "LUNA_MODEL": "openai/gpt-6-luna-decisions",
+    "LUNA_TIMEOUT_MS": "4000",
+    "LUNA_DAILY_CAP_USD": "1",
+    "LUNA_DAILY_CALLS": "6000",
+    // The search's intent step (src/lib/intent.ts): a small text model that says what a feeling, a situation or a
+    // remembered verse is after. Its calls count towards the Luna caps above.
+    "INTENT_MODEL": "anthropic/claude-haiku-5.5",
+    "INTENT_TIMEOUT_MS": "5000",
+    // The oldest store app allowed to run (/api/config minAppVersion): an older one shows only "Update AyahShare". Set
+    // these only once that version is live in the store; empty = every version runs.
+    "MIN_APP_VERSION_IOS": "",
+    "MIN_APP_VERSION_ANDROID": "", // a cold first answer can take 3 s; fast results are on screen meanwhile
+    // D1 counters (event metrics, search cache hits, share opens; src/lib/counters.ts): written at most every
+    // COUNTER_FLUSH_SECONDS per isolate, and at most COUNTER_ROWS_PER_DAY rows a day, so they never use up the D1 writes
+    // (free plan: 100k rows a day) that sign-in, shares and search need.
+    "COUNTER_FLUSH_SECONDS": "15",
+    "COUNTER_ROWS_PER_DAY": "50000",
+    // Query embeddings through OpenRouter (src/lib/embed.ts); must match the model and size the indexes were built with.
+    "EMBED_MODEL": "google/gemini-embedding-2",
+    "EMBED_DIM": "384",
+    "GOOGLE_CLIENT_ID": "11230418675-4asq5ei92772kibedhnfb7e0bka4mtt8.apps.googleusercontent.com",
+    // Cloudflare Turnstile (bot check before an email sign-in code is sent; src/lib/turnstile.ts): the widget's public
+    // site key (Dashboard → Turnstile). Required only once this and the TURNSTILE_SECRET secret are both set; while either
+    // is empty, email sign-in works without the check.
+    "TURNSTILE_SITE_KEY": "",
+    // Quran Foundation API for Reflect (tafsir, QuranReflect; src/lib/qf.ts): "production" or "prelive". The client id and
+    // secret are the Worker secrets QF_CLIENT_ID / QF_CLIENT_SECRET.
+    "QF_ENV": "production",
+    // Who may open /admin by signing in with their account (Google or email code): comma-separated addresses.
+    "ADMIN_EMAILS": "",
+    // Cloudflare Access in front of /admin (empty until the owner sets it up; ADMIN_TOKEN works meanwhile).
+    "ACCESS_TEAM_DOMAIN": "",
+    "ACCESS_AUD": "",
+    // App links for share links (src/routes/wellknown.ts); placeholders are served while these are empty.
+    // APPLE_TEAM_ID: the Apple Developer team id (10 characters). ANDROID_CERT_SHA256: the app signing certificate's
+    // SHA-256 fingerprint(s) from Play Console → App integrity (comma-separated, AA:BB:… form).
+    "APPLE_TEAM_ID": "F9FZQJ3FT6",
+    "ANDROID_CERT_SHA256": "83:68:A8:82:0B:48:70:FF:41:4D:C7:AD:CC:41:A0:90:99:C6:84:BB:24:7A:CC:61:B0:5A:AF:A4:49:F5:06:01,30:5A:05:14:90:C2:E1:54:AF:FB:35:E2:86:D8:2B:4A:F8:9F:5C:9C:37:00:7C:3F:2A:92:24:BB:B5:E7:B6:8C",
+    // Sign in with Apple token revocation on account deletion (src/lib/apple.ts): the id of the Sign in with Apple key
+    // (Apple Developer → Keys; primary App ID com.ayahshare.app) whose .p8 is the APPLE_SIGNIN_KEY secret, with APPLE_TEAM_ID.
+    "APPLE_KEY_ID": "JCMSTAL9C4",
+    // The web's daily reminder (Web Push, src/lib/webpush.ts): the public VAPID key (base64url, uncompressed P-256 point)
+    // the browser subscribes with. The reminder is offered only once the VAPID_PRIVATE_KEY secret (its pair) is set too.
+    "VAPID_PUBLIC_KEY": "BIj1q-5tzkVbEhVsfHmMHlpod9Vs1bApDy2zLxzx2lBHdpuN2MJkaEDddsEvQTuyjWrOcEiJtiUxnYil13A-ThU"
+  },
+  // Secrets (wrangler secret put): OPENROUTER_API_KEY, ADMIN_TOKEN (pipeline ingestion, admin API), QF_CLIENT_ID,
+  // QF_CLIENT_SECRET (Quran Foundation API: tafsir and reflections), AUTH_CODE_SECRET (email sign-in: the key its codes
+  // are hashed with; any long random string, e.g. `openssl rand -base64 32`), TURNSTILE_SECRET (the Turnstile widget's
+  // secret key, with TURNSTILE_SITE_KEY above), APPLE_SIGNIN_KEY (the Sign in with Apple key's .p8 file, PEM text, for
+  // APPLE_KEY_ID above: `wrangler secret put APPLE_SIGNIN_KEY < AuthKey_<APPLE_KEY_ID>.p8`), VAPID_PRIVATE_KEY (the private half of
+  // VAPID_PUBLIC_KEY above: the base64url 32-byte P-256 scalar 'd', `wrangler secret put VAPID_PRIVATE_KEY`)
+  "observability": { "enabled": true }
+}

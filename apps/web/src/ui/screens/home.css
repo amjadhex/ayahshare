@@ -1,0 +1,79 @@
+/* Home: the prompt in the middle, moving up as the person types. Classes home-*. */
+.home { --home-drop: clamp(0px, calc((100dvh - 56px - var(--nav-h) - 480px) * 0.45), 168px); --home-line: color-mix(in srgb, var(--ink) 14%, var(--bg));
+  min-height: 100dvh; display: flex; flex-direction: column; }
+.home-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* top bar: brand, streak, activity */
+.home-bar { flex: none; width: 100%; max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between;
+  min-height: calc(56px + env(safe-area-inset-top)); padding: env(safe-area-inset-top) max(8px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left)); }
+.home-actions { display: flex; align-items: center; gap: 2px; margin-inline-start: auto; }
+.home-activity { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; background: none; color: var(--ink); }
+.home-activity svg { width: 26px; height: 26px; stroke-width: 1.9; }
+/* Something new in Notifications (activitySeen.ts): a small dot on the bell. */
+.home-activity { position: relative; }
+.home-activity[data-new]::after { content: ""; position: absolute; top: 9px; right: 9px; width: 9px; height: 9px; border-radius: 50%; background: #ff5a4f; box-shadow: 0 0 0 2px var(--bg); }
+.app[data-layout="desktop"] .home-logo { display: none; } /* the side bar already shows the name */
+
+/* the column: the whole idle block sits a little below the top and moves up when typing starts */
+.home-stage { flex: 1; width: 100%; max-width: 640px; margin: 0 auto; padding: 8px max(20px, env(safe-area-inset-right)) 32px max(20px, env(safe-area-inset-left)); }
+.home-hero { transform: translateY(var(--home-drop)); transition: transform 0.42s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.home[data-typing] .home-hero { transform: none; }
+.home-intro { display: grid; grid-template-rows: 1fr; opacity: 1; transition: grid-template-rows 0.38s ease, opacity 0.24s ease; }
+.home[data-typing] .home-intro { grid-template-rows: 0fr; opacity: 0; }
+.home-intro-in { min-height: 0; overflow: hidden; display: flex; flex-direction: column; align-items: center; text-align: center; transition: visibility 0s linear 0s; }
+.home[data-typing] .home-intro-in { visibility: hidden; transition: visibility 0s linear 0.4s; }
+.home-mark { width: 52px; height: 52px; }
+.home-greeting { margin: 14px 0 0; font-size: 14px; color: var(--muted); }
+.home-title { margin: 6px 0 22px; font: 500 27px/1.2 var(--font-display); /* Medium (owner, 12 Oct 2026: lighter; index.html loads 500) */ letter-spacing: -0.4px; text-wrap: balance; }
+
+/* the prompt */
+.home-box { display: flex; align-items: center; gap: 8px; height: 56px; padding: 0 6px 0 18px; border-radius: 28px; background: var(--surface);
+  border: 1px solid var(--home-line); box-shadow: var(--shadow); transition: border-color 0.15s; }
+.home-box:focus-within { border-color: var(--accent); }
+.home-box input { flex: 1; min-width: 0; height: 100%; border: 0; outline: none; background: transparent; font-size: 16px; color: var(--ink); }
+.home-box input::placeholder { color: var(--muted); opacity: 1; }
+.home-clear { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; background: none; color: var(--muted); }
+.home-clear span { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--surface-2); }
+.home-clear svg { width: 16px; height: 16px; }
+.home-go { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: var(--accent); color: var(--accent-ink); }
+.home-go svg { width: 20px; height: 20px; stroke-width: 2.2; }
+
+/* suggestions while typing */
+.home-suggest { list-style: none; margin: 10px 0 0; padding: 0; border-radius: 20px; background: var(--surface); border: 1px solid var(--line); overflow: hidden; animation: home-in 0.25s ease-out; }
+.home-suggest li + li { border-top: 1px solid var(--line); }
+.home-suggest button { width: 100%; min-height: 52px; display: flex; align-items: center; gap: 12px; padding: 0 16px; border: 0; background: transparent; color: var(--ink); font-size: 15px; text-align: start; }
+.home-suggest button span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.home-suggest button svg { color: var(--muted); }
+.home-suggest button svg:last-child { width: 16px; height: 16px; opacity: 0.7; }
+.home-suggest button:hover, .home-suggest button:focus-visible { background: var(--surface-2); }
+.home-suggest button:focus-visible { outline-offset: -2px; }
+@keyframes home-in { from { opacity: 0; transform: translateY(-4px); } }
+
+/* idle: topics, reference hint, picker */
+/* one row that scrolls sideways, edge to edge of the column, fading at both ends */
+.home-chips { margin: 16px -20px 0; padding: 4px 20px; display: flex; align-items: center; gap: 8px; overflow-x: auto; overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity; scroll-padding-inline: 20px; scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 20px, #000 calc(100% - 20px), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 20px, #000 calc(100% - 20px), transparent); }
+.home-chips::-webkit-scrollbar { display: none; }
+.home-chips > button { flex: none; scroll-snap-align: start; white-space: nowrap; }
+.home-chips button:not(.home-more) { min-height: 38px; padding: 0 14px; border-radius: 99px; border: 1px solid var(--home-line); background: var(--surface); color: var(--ink); font-size: 14px; font-weight: 500; }
+.home-chips button:not(.home-more):hover { border-color: var(--accent); color: var(--accent); }
+.home-chips .fresh { animation: home-in 0.6s ease-out; }
+.home-more { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 50%; background: none; color: var(--muted); }
+.home-more:hover { color: var(--accent); }
+@media (pointer: coarse) { .home-chips button:not(.home-more) { min-height: 44px; padding: 0 16px; } .home-more { width: 44px; height: 44px; } }
+.home-hint { margin: 16px 0 0; text-align: center; font-size: 13px; color: var(--muted); }
+.home-suggest + .home-hint { margin-top: 14px; }
+.home-pick { display: flex; align-items: center; gap: 8px; min-height: 44px; margin: 10px auto 0; padding: 0 18px; border: 0; border-radius: 22px; background: var(--accent-soft); color: var(--accent); font-size: 14px; font-weight: 600; }
+.home-pick svg { width: 18px; height: 18px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .home-hero, .home-intro, .home-intro-in, .home-box { transition: none; }
+  .home-suggest, .home-chips .fresh { animation: none; }
+}
+
+/* the maker's credit at the foot (MadeBy.tsx): on phones the screen ends above the bottom bar, so it shows without scrolling */
+.app[data-layout="phone"] .home { min-height: calc(100dvh - var(--nav-h)); }
+.home-credit { flex: none; }
+.home[data-typing] .home-credit { visibility: hidden; }

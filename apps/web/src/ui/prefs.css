@@ -1,0 +1,18 @@
+/* Preferences (the sheet on Profile, ui/Profile.tsx PreferencesPanel): groups with a small heading, each a card of rows that
+   open their own picker. Nothing is wider than the sheet: segmented controls wrap, values end in an ellipsis. */
+.prefs { display: grid; gap: 20px; min-width: 0; padding-bottom: 8px; }
+.prefs-hint { margin: 0; }
+.pref-group { min-width: 0; }
+.pref-heading { display: flex; align-items: baseline; gap: 8px; margin: 0 2px 8px; font-size: 12.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
+.pref-heading .count { margin-inline-start: auto; font-weight: 500; letter-spacing: 0; text-transform: none; font-variant-numeric: tabular-nums; }
+.pref-card { display: grid; gap: 14px; min-width: 0; padding: 12px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
+.pref-note { margin: 0; font-size: 13px; color: var(--muted); }
+.pref-toggle .hint { margin: 6px 2px 0; font-size: 12.5px; color: var(--muted); }
+.pref-card .toggle { padding: 0 2px; }
+.pref-card .field { min-width: 0; }
+.pref-card .seg { grid-template-columns: repeat(auto-fit, minmax(54px, 1fr)); } /* five short words in a row where they fit, else they wrap */
+.pref-card .seg button { padding: 0 4px; }
+.pref-card > .link-btn { justify-self: start; margin: 0; }
+.pref-card .interest-chips { padding: 0; }
+.interests-sheet .interest-chips.all { max-height: none; overflow: visible; padding: 4px; }
+.interests-sheet .pref-note { margin: 0 2px 10px; }
